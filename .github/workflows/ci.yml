@@ -1,4 +1,4 @@
-name: CI-Build
+name: Reusable CI-Build
 
 on: 
   workflow_call:
