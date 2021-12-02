@@ -2,6 +2,13 @@ name: Reusable CI-Build
 
 on: 
   workflow_call:
+    inputs:
+      mvnArgs:
+        type: string
+        required: false
+    secrets:
+      mvnArgs:
+        required: false
 
 jobs:
   build:
@@ -16,7 +23,7 @@ jobs:
         java-version: 11
 
     - name: Build with Maven
-      run: mvn clean verify --batch-mode
+      run: mvn clean verify --batch-mode ${{ inputs.mvnArgs }} ${{ secrets.mvnArgs }}
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v1
