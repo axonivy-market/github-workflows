@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    uses: axonivy-market/github-workflows/.github/workflows/ci.yml@v1
+    uses: axonivy-market/github-workflows/.github/workflows/ci.yml@v2
 ```
 
 or e.g. `.github/workflows/release.yml`:
@@ -27,6 +27,9 @@ on: workflow_dispatch
 
 jobs:
   build:
-    uses: axonivy-market/github-workflows/.github/workflows/release.yml@v1
+    uses: axonivy-market/github-workflows/.github/workflows/release.yml@v2
 
 ```
+
+## Versions
+
