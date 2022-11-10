@@ -23,8 +23,8 @@ jobs:
 
     - name: Configure Git
       run: |
-        git config user.email "actions@github.com"
-        git config user.name "GitHub Actions"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+        git config user.name "${{ github.actor }}"
         git checkout -b new-release
 
     - name: Build with Maven
@@ -39,3 +39,4 @@ jobs:
         source_branch: new-release
         pr_title: "Release"
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        pr_assignee: ${{ github.actor }}
