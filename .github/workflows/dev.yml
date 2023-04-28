@@ -1,0 +1,18 @@
+name: Dev-Build
+
+on: 
+  workflow_call:
+    inputs:
+      mvnArgs:
+        type: string
+        required: false
+      ivyVersion:
+        type: string
+        default: dev
+        description: the ivy version to use (e.g. dev/nightly/nightly-10/...)
+
+jobs:
+  build:
+    uses: axonivy-market/github-workflows/.github/workflows/ci.yml@v2
+    with:
+      mvnArgs: '"-Divy.engine.download.url=https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip" "-Divy.engine.version=(10.0.0,]" ${{ inputs.mvnArgs }}'
