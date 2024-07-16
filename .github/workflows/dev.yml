@@ -13,6 +13,9 @@ on:
     secrets:
       mvnArgs:
         required: false
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
