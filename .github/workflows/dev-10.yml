@@ -9,10 +9,13 @@ on:
       ivyVersion:
         type: string
         default: nightly-10.0
-        description: the ivy version to use (e.g. dev/nightly/nightly-10/...)
+        description: the ivy version to use (e.g. dev/nightly/nightly-10.0/...)
     secrets:
       mvnArgs:
         required: false
+  pull_request:
+    branches:
+      - release/10.0
 
 jobs:
   build:

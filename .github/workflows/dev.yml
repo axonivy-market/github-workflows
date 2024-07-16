@@ -9,7 +9,7 @@ on:
       ivyVersion:
         type: string
         default: dev
-        description: the ivy version to use (e.g. dev/nightly/nightly-10/...)
+        description: the ivy version to use (e.g. dev/nightly/nightly-10.0/...)
     secrets:
       mvnArgs:
         required: false
