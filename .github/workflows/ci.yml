@@ -6,6 +6,9 @@ on:
       mvnArgs:
         type: string
         required: false
+      javaVersion:
+        type: number
+        default: 17
     secrets:
       mvnArgs:
         required: false
@@ -20,7 +23,7 @@ jobs:
     - name: Setup Java JDK
       uses: actions/setup-java@v4
       with:
-        java-version: 17
+        java-version: ${{ inputs.javaVersion }}
         distribution: temurin
 
     - name: Build with Maven
