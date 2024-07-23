@@ -6,6 +6,12 @@ on:
       mvnArgs:
         type: string
         required: false
+      javaVersion:
+        type: number
+        default: 17
+      mvnVersion:
+        type: string
+        default: 3.6.3
     secrets:
       mvnArgs:
         required: false
@@ -20,8 +26,13 @@ jobs:
     - name: Setup Java JDK
       uses: actions/setup-java@v4
       with:
-        java-version: 17
+        java-version: ${{ inputs.javaVersion }}
         distribution: temurin
+
+    - name: Set up Maven
+      uses: stCarolas/setup-maven@v5
+      with:
+        maven-version: ${{ inputs.mvnVersion }}
 
     - name: Build with Maven
       run: mvn clean verify -Dmaven.test.failure.ignore=true --batch-mode ${{ inputs.mvnArgs }} ${{ secrets.mvnArgs }}
