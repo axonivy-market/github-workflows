@@ -29,7 +29,7 @@ jobs:
         java-version: ${{ inputs.javaVersion }}
         distribution: temurin
 
-    - name: Set up Maven
+    - name: Setup Maven
       uses: stCarolas/setup-maven@v5
       with:
         maven-version: ${{ inputs.mvnVersion }}
