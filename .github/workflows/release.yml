@@ -2,6 +2,10 @@ name: Reusable Release-Build
 
 on: 
   workflow_call:
+    inputs:
+      javaVersion:
+        type: number
+        default: 17
 
 jobs:
   build:
@@ -17,7 +21,7 @@ jobs:
     - name: Setup Java JDK
       uses: actions/setup-java@v4
       with:
-        java-version: 17
+        java-version: ${{ inputs.javaVersion }}
         distribution: temurin
         server-id: github
 
