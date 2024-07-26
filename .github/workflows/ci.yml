@@ -50,6 +50,7 @@ jobs:
       with:
         path: |
           */target/*.iar
+          */target/*.jar
           *product/target/*.zip
 
     - name: Archive test reports
