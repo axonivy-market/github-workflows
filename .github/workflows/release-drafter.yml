@@ -6,7 +6,7 @@ on:
       - master
   pull_request:
     types: [opened, reopened, synchronize]
-  workflow_dispatch:
+  workflow_call:
     inputs:
       version:
         description: 'Release version'
