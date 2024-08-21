@@ -1,4 +1,4 @@
-name: Release Drafter
+name: Reusable Release Drafter
 
 on:
   workflow_call:
