@@ -2,16 +2,6 @@ name: Reusable Release Drafter
 
 on:
   workflow_call:
-    inputs:
-      version:
-        description: 'Release version'
-        required: false
-        type: string
-      prerelease:
-        description: 'Is this a prerelease?'
-        required: false
-        default: 'false'
-        type: string
 
 permissions:
   contents: read
@@ -21,39 +11,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    env:
-      IS_PUSH_EVENT_TRIGGERED: ${{ github.event_name == 'push' }}
-      COMMITISH: 'master'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        if: env.IS_PUSH_EVENT_TRIGGERED == 'false'
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Get commit SHA for the provided version
-        id: get-sha
-        if: env.IS_PUSH_EVENT_TRIGGERED == 'false'
-        run: |
-          # Attempt to fetch the SHA for the provided version tag
-          SHA=$(git rev-list -n 1 ${{ github.event.inputs.version }} || echo "")
-          
-          # If SHA is empty, fallback to master branch
-          if [ -z "$SHA" ]; then
-            echo "Could not find SHA for the provided version. Falling back to master."
-            SHA="master"
-          fi
-          echo "COMMITISH=$SHA" >> $GITHUB_ENV
-
-      - name: Set commitish for push
-        if: env.IS_PUSH_EVENT_TRIGGERED == 'true'
-        run: echo "COMMITISH=master" >> $GITHUB_ENV
-      
       - uses: release-drafter/release-drafter@v6
-        with:
-          version: ${{ github.event.inputs.version }}
-          prerelease: ${{ github.event.inputs.prerelease }}
-          commitish: ${{ env.COMMITISH }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
