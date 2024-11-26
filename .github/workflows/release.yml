@@ -5,7 +5,7 @@ on:
     inputs:
       javaVersion:
         type: number
-        default: 17
+        default: 21
 
 jobs:
   build:

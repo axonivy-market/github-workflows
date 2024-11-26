@@ -8,10 +8,10 @@ on:
         required: false
       javaVersion:
         type: number
-        default: 17
+        default: 21
       mvnVersion:
         type: string
-        default: 3.6.3
+        default: 3.9.8
     secrets:
       mvnArgs:
         required: false
