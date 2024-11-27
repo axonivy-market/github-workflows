@@ -1,0 +1,75 @@
+name: Reusable API test workflow
+
+on:
+  workflow_call:
+    inputs:
+      postman_collection_location:
+        description: Location of postman collection file in the repo
+        type: string
+        default: ./api.postman_collection.json
+    secrets:
+      postman_env_content:
+        description: The content of postman env file in string format
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if collection file exists
+        id: check_file
+        run: |
+          if [ ! -f ${{ inputs.postman_collection_location }} ]; then
+            echo "Collection file not found!"
+            echo "api_collections_found=false" >> $GITHUB_ENV
+          else
+            echo "api_collections_found=true" >> $GITHUB_ENV
+          fi
+
+      - name: Create env file
+        if: env.api_collections_found == 'true'
+        run: |
+          if [ -z "${{ secrets.postman_env_content }}" ]; then
+            echo '{"values":[{"key":"name","value":"postman-env"}]}' > env.json
+          else
+            echo '${{ secrets.postman_env_content }}' > env.json
+          fi
+
+      - name: Validate env.json format
+        if: env.api_collections_found == 'true'
+        run: |
+          if ! jq empty env.json; then
+            echo "Invalid JSON format in secrets.postman_env_content"
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        if: env.api_collections_found == 'true'
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies
+        if: env.api_collections_found == 'true'
+        run: |
+          npm install -g newman newman-reporter-ctrf-json
+
+      - name: Run Newman tests
+        if: env.api_collections_found == 'true'
+        run: |
+          newman run ${{ inputs.postman_collection_location }} \
+            --environment env.json \
+            -r cli,ctrf-json \
+            --reporter-ctrf-json-test-type api
+
+      - name: Export test summary
+        if: always()
+        run: |
+          if [ "${{ env.api_collections_found }}" == "true" ]; then
+            echo "Exporting test summary..."
+            npx github-actions-ctrf ./ctrf/ctrf-report.json
+          else
+            echo "::warning title=Api Test Execution Skipped.::No API collections were found for testing. Skipped test execution."
+          fi
