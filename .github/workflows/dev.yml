@@ -12,10 +12,10 @@ on:
         description: the ivy version to use (e.g. dev/nightly/nightly-10/...)
       ivyPluginVersion:
         type: string
-        default: 11.4.0-SNAPSHOT
+        default: 13.1.0-SNAPSHOT
       testerVersion:
         type: string
-        default: 11.4.0-SNAPSHOT
+        default: 13.1.0-SNAPSHOT
     secrets:
       mvnArgs:
         required: false
@@ -24,7 +24,7 @@ jobs:
   build:
     uses: axonivy-market/github-workflows/.github/workflows/ci.yml@v5
     with:
-      mvnArgs: '"-Divy.engine.download.url=https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip" "-Divy.engine.version=(10.0.0,]" "-Dproject.build.plugin.version=${{ inputs.ivyPluginVersion }}" "-Dtester.version=${{ inputs.testerVersion }}" ${{ inputs.mvnArgs }}'
+      mvnArgs: '"-Divy.engine.download.url=https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip" "-Divy.engine.version=(12.0.0,]" "-Dproject.build.plugin.version=${{ inputs.ivyPluginVersion }}" "-Dtester.version=${{ inputs.testerVersion }}" ${{ inputs.mvnArgs }}'
       javaVersion: 21
       mvnVersion: 3.9.8
     secrets:
