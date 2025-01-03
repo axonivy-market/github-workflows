@@ -19,7 +19,7 @@ jobs:
       - name: Configure Release Draft Settings
         run: |
           if [ "$GITHUB_EVENT_NAME" = "push" ]; then
-            echo "COMMITISH=\"$GITHUB_REF_NAME\"" >> $GITHUB_ENV
+            echo "COMMITISH=$GITHUB_REF_NAME" >> $GITHUB_ENV
           else
             exit 0
           fi
