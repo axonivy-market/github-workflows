@@ -3,16 +3,38 @@ name: Reusable Release Drafter
 on:
   workflow_call:
 
+env:
+  DRAFTER_NAME: Next Release 🛒
+  DRAFTER_TAG: next
+  COMMITISH: master
+
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   update_release_draft:
-    permissions:
-      contents: write
-      pull-requests: write
     runs-on: ubuntu-latest
     steps:
+      - name: Configure Release Draft Settings
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            echo "COMMITISH=${{ github.ref_name }}" >> $GITHUB_ENV
+          else
+            exit 0
+          fi
+
+          if [[ "${{ github.ref_name }}" == "release/10.0" ]]; then
+            echo "DRAFTER_NAME=Next Release 10.0 🛒" >> $GITHUB_ENV
+            echo "DRAFTER_TAG=next-10.0" >> $GITHUB_ENV
+          fi
+
       - uses: release-drafter/release-drafter@v6
+        with:
+          name: ${{ env.DRAFTER_NAME }}
+          tag: ${{ env.DRAFTER_TAG }}
+          commitish: ${{ env.COMMITISH }}
+          disable-releaser: ${{ github.event_name != 'push' }}
+          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
