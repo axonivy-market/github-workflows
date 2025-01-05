@@ -61,6 +61,7 @@ jobs:
         tag: ${{ env.RELEASE_VERSION }}
         version: ${{ env.RELEASE_VERSION }}
         commitish: ${{ env.COMMITISH }}
+        latest: ${{ env.COMMITISH == 'master' }}
         publish: ${{ inputs.publish }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
