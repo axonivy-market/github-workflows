@@ -1,0 +1,67 @@
+name: Reusable Release Drafter Publisher
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: false
+        type: string
+      commitish:
+        required: false
+        type: string
+      publish:
+        required: false
+        default: true
+        type: boolean
+
+env:
+  RELEASE_VERSION: ${{ inputs.tag }}
+  COMMITISH: ${{ inputs.commitish }}
+
+jobs:
+  publish_release_draft:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get Most Recent Tag
+      if: ${{ !env.RELEASE_VERSION }}
+      run: |
+        git fetch --tags
+        MOST_RECENT_TAG=$(git tag --sort=-creatordate | head -n 1)
+        if [ -z "$MOST_RECENT_TAG" ]; then
+          echo "Error: No tag found in the repository."
+          exit 1
+        fi
+        echo "Most recent tag: $MOST_RECENT_TAG"
+        echo "RELEASE_VERSION=$MOST_RECENT_TAG" >> $GITHUB_ENV
+
+    - name: Configure Release Settings
+      run: |
+        if [[ -z "$COMMITISH" ]]; then
+          # Extract version number from RELEASE_VERSION, e.g., "v10.0.1" => "10.0"
+          VERSION_NUMBER=$(echo "$RELEASE_VERSION" | sed -E 's/^v([0-9]+\.[0-9]+)\..*/\1/')
+          
+          # Check if the branch for this version exists and set COMMITISH
+          if [[ $(git branch -r | grep "origin/release/$VERSION_NUMBER") ]]; then
+            echo "COMMITISH=release/$VERSION_NUMBER" >> $GITHUB_ENV
+          else
+            echo "COMMITISH=master" >> $GITHUB_ENV
+          fi
+        fi
+      env:
+        RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+        COMMITISH: ${{ env.COMMITISH }}
+
+    - name: Use Release Drafter
+      uses: release-drafter/release-drafter@v6
+      with:
+        disable-autolabeler: true
+        name: ${{ env.RELEASE_VERSION }} 🛒
+        tag: ${{ env.RELEASE_VERSION }}
+        version: ${{ env.RELEASE_VERSION }}
+        commitish: ${{ env.COMMITISH }}
+        latest: ${{ env.COMMITISH == 'master' }}
+        publish: ${{ inputs.publish }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
