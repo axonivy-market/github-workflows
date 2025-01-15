@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Configure Release Draft Settings
         run: |
-          if [ "$GITHUB_EVENT_NAME" != "push" ]; then
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" || "$GITHUB_EVENT_NAME" == "pull_request_target" ]]; then
             exit 0
           fi
 
