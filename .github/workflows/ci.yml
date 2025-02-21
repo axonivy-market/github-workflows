@@ -40,9 +40,8 @@ jobs:
     - name: Publish Unit Test Results
       id: test_report
       uses: dorny/test-reporter@v1.9.1
-      if: always()
       with:
-        name: Test Results
+        name: JUnit Test Results
         reporter: java-junit
         path: '**/target/*-reports/*.xml'
 
@@ -53,7 +52,6 @@ jobs:
 
     - name: Archive test json file
       uses: actions/upload-artifact@v4
-      if: failure()
       with:
         name: export-test-json-file
         retention-days: 5
