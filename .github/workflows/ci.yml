@@ -37,14 +37,16 @@ jobs:
     - name: Build with Maven
       run: mvn clean verify --batch-mode --fail-at-end ${{ inputs.mvnArgs }} ${{ secrets.mvnArgs }}
 
+    - name: Remove test summary file
+      run: rm -f **/target/*-reports/*-summary.xml
+
     - name: Publish Unit Test Results
       id: test_report
       uses: dorny/test-reporter@v1.9.1
-      if: always()
       with:
         name: JUnit Test Results
         reporter: java-junit
-        path: '**/target/*-reports/!(*-summary).xml'
+        path: '**/target/*-reports/*.xml'
 
     - name: Export test results to json file
       run: |
