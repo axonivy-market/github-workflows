@@ -37,13 +37,29 @@ jobs:
     - name: Build with Maven
       run: mvn clean verify --batch-mode --fail-at-end ${{ inputs.mvnArgs }} ${{ secrets.mvnArgs }}
 
+    - name: Remove test summary files
+      run: rm -f **/target/*-reports/*-summary.xml
+
     - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
+      id: test_report
+      uses: dorny/test-reporter@v1.9.1
       if: always()
       with:
-        junit_files: |
-          */target/*-reports/*.xml
-          !*/target/*-reports/failsafe-summary.xml
+        name: JUnit Test Results
+        reporter: java-junit
+        path: '**/target/*-reports/*.xml'
+
+    - name: Export test results to json file
+      run: |
+        response=$(curl ${{ steps.test_report.outputs.url }})
+        echo $response > test_report.json
+
+    - name: Archive test json file
+      uses: actions/upload-artifact@v4
+      with:
+        name: export-test-json-file
+        retention-days: 5
+        path: 'test_report.json'
 
     - name: Archive build artifact
       uses: actions/upload-artifact@v4
