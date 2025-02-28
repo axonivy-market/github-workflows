@@ -43,7 +43,7 @@ jobs:
     - name: Publish Unit Test Results
       id: test_report
       uses: dorny/test-reporter@v1.9.1
-      if: success() || failure()
+      if: always() && hashFiles('**/target/*-reports/*.xml') != ''
       with:
         name: JUnit Test Results
         reporter: java-junit
