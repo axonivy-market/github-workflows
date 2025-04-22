@@ -17,11 +17,8 @@ jobs:
     steps:
       - name: Check if release drafter should run
         run: |
-          if [ "${GITHUB_REPOSITORY_OWNER}" != "axonivy-market" ]; then
+          if [ "${GITHUB_REPOSITORY_OWNER}" != "axonivy-market" & ! -f .github/release-drafter.yml ]; then
             echo "⚠️ Only active in AxonIvy market environment. Skipping Release Drafter."
-            echo "SKIP_DRAFTER=true" >> $GITHUB_ENV
-          elif [ ! -f .github/release-drafter.yml ]; then
-            echo "⚠️ .github/release-drafter.yml not found. Skipping Release Drafter."
             echo "SKIP_DRAFTER=true" >> $GITHUB_ENV
           else
             echo "✅ Conditions met. Release Drafter will run."
