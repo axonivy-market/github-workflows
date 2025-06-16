@@ -12,10 +12,10 @@ on:
         description: the ivy version to use (e.g. dev/nightly/nightly-10/...)
       ivyPluginVersion:
         type: string
-        default: 13.1.0-SNAPSHOT
+        default: 13.2.0-SNAPSHOT
       testerVersion:
         type: string
-        default: 13.1.0-SNAPSHOT
+        default: 13.2.0-SNAPSHOT
     secrets:
       mvnArgs:
         required: false
