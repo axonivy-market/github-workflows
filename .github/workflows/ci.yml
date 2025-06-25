@@ -74,6 +74,14 @@ jobs:
         retention-days: 5
         path: 'test_report.json'
 
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: github.event.pull_request.head.repo.full_name != github.repository
+      with:
+        junit_files: |
+          */target/*-reports/*.xml
+          !*/target/*-reports/failsafe-summary.xml
+  
     - name: Archive build artifact
       uses: actions/upload-artifact@v4
       with:
