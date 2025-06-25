@@ -20,11 +20,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions:
-      checks: write
-      contents: write
-      actions: write
-
     steps:
     - uses: actions/checkout@v4
 
@@ -44,6 +39,7 @@ jobs:
 
     - name: Check if test results exist
       id: check_test_files
+      if: github.event.pull_request.head.repo.full_name == github.repository
       run: |
         if [[ "${{ hashFiles('**/target/*-reports/*.xml') }}" != "" ]]; then
           echo "exists=true" >> $GITHUB_OUTPUT
