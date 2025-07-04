@@ -55,7 +55,7 @@ jobs:
         export testerVersion=${{ inputs.testerVersion }}
         export IVY_JAVA_HOME=$JAVA_HOME_21_X64
         echo "workDir=$(pwd)" >> $GITHUB_ENV
-        ./raise-all-market-products.sh ${{ inputs.latestIvyVersion }}
+        https://github.com/axonivy-market/github-workflows/blob/feature/MARP-2509-Automatic-Update-of-market-extension/raise-all-market-products.sh ${{ inputs.latestIvyVersion }}
       shell: bash
 
     - name: Build with Maven
