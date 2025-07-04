@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Usage: project-migrator.sh <version> <repository-name>
+# Usage: repo-migrator.sh
 #
 
 source "$DIR/project-migrator.sh"
@@ -11,8 +11,6 @@ updateMavenVersion() {
   updateMvnProperty "tester.version" "${testerVersion}"
   artifactVersion $convert_to_version
 }
-
-convert_to_version=$1
 
 downloadEngine
 raiseProject

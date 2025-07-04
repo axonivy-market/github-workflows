@@ -51,11 +51,11 @@ jobs:
     - name: Convert to lastest Ivy version
       run: |
         export engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
-        export projectBuildPluginVersion=${{ inputs.projectBuildPluginVersion }}
+        export projectBuildPluginVersion=${{ inputs.ivyPluginVersion }}
         export testerVersion=${{ inputs.testerVersion }}
         export IVY_JAVA_HOME=$JAVA_HOME_21_X64
         echo "workDir=$(pwd)" >> $GITHUB_ENV
-        ./projects-migrator.sh ${{ inputs.latestIvyVersion }}
+        ./raise-all-market-products.sh ${{ inputs.latestIvyVersion }}
       shell: bash
 
     - name: Build with Maven
