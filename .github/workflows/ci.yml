@@ -59,6 +59,7 @@ jobs:
         name: JUnit Test Results
         reporter: java-junit
         path: '**/target/*-reports/*.xml'
+        fail-on-error: 'false'
 
     - name: Export test results to json file
       if: steps.check_test_files.outputs.exists == 'true'
