@@ -10,6 +10,16 @@ on:
         type: string
         default: dev
         description: the ivy version to use (e.g. dev/nightly/nightly-10/...)
+      latestIvyVersion:
+        type: string
+        default: 13.2.0
+        description: the latest ivy version to use
+      javaVersion:
+        type: string
+        default: 21
+      mvnVersion:
+        type: string
+        default: 3.9.8
       ivyPluginVersion:
         type: string
         default: 13.2.0-SNAPSHOT
@@ -22,10 +32,86 @@ on:
 
 jobs:
   build:
-    uses: axonivy-market/github-workflows/.github/workflows/ci.yml@v6
-    with:
-      mvnArgs: '"-Divy.engine.download.url=https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip" "-Divy.engine.version=(12.0.0,]" "-Dproject.build.plugin.version=${{ inputs.ivyPluginVersion }}" "-Dtester.version=${{ inputs.testerVersion }}" ${{ inputs.mvnArgs }}'
-      javaVersion: 21
-      mvnVersion: 3.9.8
-    secrets:
-      mvnArgs: '${{ secrets.mvnArgs }}'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.javaVersion }}
+        distribution: temurin
+
+    - name: Setup Maven
+      uses: stCarolas/setup-maven@v5
+      with:
+        maven-version: ${{ inputs.mvnVersion }}
+
+    - name: Convert to lastest Ivy version
+      run: |
+        export engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
+        export projectBuildPluginVersion=${{ inputs.projectBuildPluginVersion }}
+        export testerVersion=${{ inputs.testerVersion }}
+        export IVY_JAVA_HOME=$JAVA_HOME_21_X64
+        echo "workDir=$(pwd)" >> $GITHUB_ENV
+        ./projects-migrator.sh ${{ inputs.latestIvyVersion }}
+      shell: bash
+
+    - name: Build with Maven
+      run: mvn clean verify --batch-mode --fail-at-end "-Divy.engine.download.url=https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip" "-Divy.engine.version=(12.0.0,]" "-Dproject.build.plugin.version=${{ inputs.ivyPluginVersion }}" "-Dtester.version=${{ inputs.testerVersion }}" ${{ inputs.mvnArgs }} ${{ secrets.mvnArgs }}
+
+    - name: Check if test results exist
+      id: check_test_files
+      run: |
+        if [[ "${{ hashFiles('**/target/*-reports/*.xml') }}" != "" ]]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Remove test summary files
+      if: steps.check_test_files.outputs.exists == 'true'
+      run: rm -f **/target/*-reports/*-summary.xml
+
+    - name: Publish Unit Test Results
+      id: test_report
+      uses: dorny/test-reporter@v1.9.1
+      if: steps.check_test_files.outputs.exists == 'true'
+      with:
+        name: JUnit Test Results
+        reporter: java-junit
+        path: '**/target/*-reports/*.xml'
+
+    - name: Export test results to json file
+      if: steps.check_test_files.outputs.exists == 'true'
+      run: |
+        response=$(curl ${{ steps.test_report.outputs.url }})
+        echo $response > test_report.json
+
+    - name: Archive test json file
+      uses: actions/upload-artifact@v4
+      if: steps.check_test_files.outputs.exists == 'true'
+      with:
+        name: export-test-json-file
+        retention-days: 5
+        path: 'test_report.json'
+
+    - name: Archive build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        path: |
+          */target/*.iar
+          */target/*-[0-9]*.jar
+          *product/target/*.zip
+
+    - name: Archive test reports
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test-reports
+        retention-days: 5
+        path: |
+          */target/testEngineOut.log
+          */target/selenide/*
+          */target/ivyEngine/deploy/*/*.deploymentLog
