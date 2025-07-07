@@ -50,13 +50,61 @@ jobs:
 
     - name: Convert to lastest Ivy version
       run: |
-        export engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
-        export projectBuildPluginVersion=${{ inputs.ivyPluginVersion }}
-        export testerVersion=${{ inputs.testerVersion }}
-        export IVY_JAVA_HOME=$JAVA_HOME_21_X64
+        engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
+        IVY_JAVA_HOME=$JAVA_HOME_21_X64
         echo "workDir=$(pwd)" >> $GITHUB_ENV
-        axonivy-market/github-workflows/.github/workflows/raise-all-market-products.sh@feature/MARP-2509-Automatic-Update-of-market-extension ${{ inputs.latestIvyVersion }}
-      shell: bash
+        DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+        if [ -z "$workDir" ]; then
+          workDir=$(mktemp -d -t projectConvertXXX)
+        fi
+
+        if [ -z "$gitDir" ]; then
+          gitDir="$DIR/repos"
+          echo $(mkdir -v -p $DIR/repos)
+        fi
+
+        if ! [ -d "${workDir}/engine" ]; then
+          echo "Downloading engine from ${engineUrl}"
+          (cd "$workDir" && curl --progress-bar -L -O "${engineUrl}") 
+          zipped=$(find "${workDir}" -maxdepth 1 -name "*.zip")
+          unzip -qq "${zipped}" -d "${workDir}/engine"
+          rm "${zipped}"
+        fi
+
+        gitDir=$(pwd)
+        gitName=$(basename ${gitDir})
+        echo "Searching projects in ${gitDir}"
+        projects=()
+        for ivyPref in $(find ${gitDir} -name "ch.ivyteam.ivy.designer.prefs"); do
+          project=$(dirname $(dirname $ivyPref))
+          if ! [ -f "${project}/pom.xml" ]; then
+            continue # prefs file not in natural project structure
+          fi
+          projects+=("${project}")
+        done
+
+        if [ ${#projects[@]} -gt 0 ]; then
+          echo "Collected projects: ${projects[@]}"
+          ${workDir}/engine/bin/EngineConfigCli migrate-project ${projects[@]}
+        else
+          echo "No projects found in ${gitDir}"
+        fi
+
+        mvn -B versions:set-property versions:commit "-Dproperty=project.build.plugin.version" "-DnewVersion=${{ inputs.ivyPluginVersion }}" -DallowSnapshots=true -DprocessAllModules
+        mvn -B versions:set-property versions:commit "-Dproperty=tester.version" "-DnewVersion=${{ inputs.testerVersion }}" -DallowSnapshots=true -DprocessAllModules
+
+        # if root pom.xml exists
+        if [ -f "pom.xml" ]; then
+          mvn -B versions:set -DnewVersion=${{ inputs.latestIvyVersion }} -DgenerateBackupPoms=false -DprocessAllModules=true
+          mvn -B versions:use-latest-versions -DgenerateBackupPoms=false -DprocessAllModules
+        fi
+        # update version in pom.xml
+        # loop through all folders
+        for d in */ ; do
+          echo "Updating $d"
+          mvn -f $d -B versions:set -DnewVersion=${{ inputs.latestIvyVersion }} -DgenerateBackupPoms=false -DprocessAllModules=true
+          mvn -f $d -B versions:use-latest-versions -DgenerateBackupPoms=false -DprocessAllModules
+        done
 
     - name: Build with Maven
       run: mvn clean verify --batch-mode --fail-at-end "-Divy.engine.download.url=https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip" "-Divy.engine.version=(12.0.0,]" "-Dproject.build.plugin.version=${{ inputs.ivyPluginVersion }}" "-Dtester.version=${{ inputs.testerVersion }}" ${{ inputs.mvnArgs }} ${{ secrets.mvnArgs }}
