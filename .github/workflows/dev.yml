@@ -13,7 +13,7 @@ on:
       latestIvyVersion:
         type: string
         default: 13.2.0
-        description: the latest ivy version to use
+        description: the latest ivy version to use (e.g. 13.2.0)
       javaVersion:
         type: string
         default: 21
