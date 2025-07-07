@@ -51,7 +51,7 @@ jobs:
       if: steps.check_test_files.outputs.exists == 'true'
       run: rm -f **/target/*-reports/*-summary.xml
 
-    - name: Publish Unit Test Results
+    - name: Publish Unit Test Results with dorny/test-reporter 
       id: test_report
       uses: dorny/test-reporter@v1.9.1
       if: steps.check_test_files.outputs.exists == 'true'
@@ -75,7 +75,7 @@ jobs:
         retention-days: 5
         path: 'test_report.json'
 
-    - name: Publish Unit Test Results
+    - name: Publish Unit Test Results with EnricoMi
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         files: |
