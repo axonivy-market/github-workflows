@@ -12,6 +12,9 @@ on:
       mvnVersion:
         type: string
         default: 3.9.8
+      skipMigrateToLatestIvyVersion:
+        type: string
+        default: "true"
     secrets:
       mvnArgs:
         required: false
@@ -33,6 +36,42 @@ jobs:
       uses: stCarolas/setup-maven@v5
       with:
         maven-version: ${{ inputs.mvnVersion }}
+
+    - name: Download latest ivy engine
+      if: skipMigrateToLatestIvyVersion != "true"
+      run: |
+        export IVY_JAVA_HOME=$JAVA_HOME_21_X64
+        engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
+        echo "workDir=$(pwd)" >> $GITHUB_ENV
+        DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+        export workDir=$(mktemp -d -t projectConvertXXX)
+        gitDir="$DIR/repos"
+        echo $(mkdir -v -p $DIR/repos)
+
+        echo "Downloading engine from ${engineUrl}"
+        (cd "$workDir" && curl --progress-bar -L -O "${engineUrl}") 
+        zipped=$(find "${workDir}" -maxdepth 1 -name "*.zip")
+        unzip -qq "${zipped}" -d "${workDir}/engine"
+        rm "${zipped}"
+
+    - name: Convert projects to latest ivy version
+      if: skipMigrateToLatestIvyVersion != "true"
+      run: |
+        gitDir=$(pwd)
+        gitName=$(basename ${gitDir})
+        echo "Searching projects in ${gitDir}"
+        projects=()
+        for ivyPref in $(find ${gitDir} -name "ch.ivyteam.ivy.designer.prefs"); do
+          project=$(dirname $(dirname $ivyPref))
+          if ! [ -f "${project}/pom.xml" ]; then
+            continue # prefs file not in natural project structure
+          fi
+          projects+=("${project}")
+        done
+        echo "Collected projects: ${projects[@]}"
+        if [ ${projects[@]} -gt 0 ]; then
+          ${workDir}/engine/bin/EngineConfigCli migrate-project ${projects[@]}
+        fi
 
     - name: Build with Maven
       run: mvn clean verify --batch-mode --fail-at-end ${{ inputs.mvnArgs }} ${{ secrets.mvnArgs }}
