@@ -15,7 +15,6 @@ on:
       skipMigrateToLatestIvyVersion:
         type: string
         default: 'true'
-        required: true
     secrets:
       mvnArgs:
         required: false
