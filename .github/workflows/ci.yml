@@ -14,7 +14,7 @@ on:
         default: 3.9.8
       skipMigrateToLatestIvyVersion:
         type: string
-        default: "true"
+        default: true
     secrets:
       mvnArgs:
         required: false
