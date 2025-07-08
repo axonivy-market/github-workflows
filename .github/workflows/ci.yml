@@ -13,8 +13,7 @@ on:
         type: string
         default: 3.9.8
       skipMigrateToLatestIvyVersion:
-        type: string
-        default: true
+        default: "true"
     secrets:
       mvnArgs:
         required: false
@@ -38,7 +37,7 @@ jobs:
         maven-version: ${{ inputs.mvnVersion }}
 
     - name: Download latest ivy engine
-      if: ${{ inputs.skipMigrateToLatestIvyVersion }} != "true"
+      if: ${{ inputs.skipMigrateToLatestIvyVersion != "true" }}
       run: |
         export IVY_JAVA_HOME=$JAVA_HOME_21_X64
         engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
@@ -54,7 +53,7 @@ jobs:
         rm "${zipped}"
 
     - name: Convert projects to latest ivy version
-      if: ${{ inputs.skipMigrateToLatestIvyVersion }} != "true"
+      if: ${{ inputs.skipMigrateToLatestIvyVersion != "true" }}
       run: |
         gitDir=$(pwd)
         gitName=$(basename ${gitDir})
