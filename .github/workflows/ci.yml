@@ -44,14 +44,21 @@ jobs:
         engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
         echo "workDir=$(pwd)" >> $GITHUB_ENV
         DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-        gitDir="$DIR/repos"
-        echo $(mkdir -v -p $DIR/repos)
-
-        echo "Downloading engine from ${engineUrl}"
-        (cd "$workDir" && curl --progress-bar -L -O "${engineUrl}") 
-        zipped=$(find "${workDir}" -maxdepth 1 -name "*.zip")
-        unzip -qq "${zipped}" -d "${workDir}/engine"
-        rm "${zipped}"
+        if [ -z "$workDir" ]; then
+          workDir=$(mktemp -d -t projectConvertXXX)
+          echo "$workDir"
+        fi
+        if [ -z "$gitDir" ]; then
+          gitDir="$DIR/repos"
+          echo $(mkdir -v -p $DIR/repos)
+        fi
+        if ! [ -d "${workDir}/engine" ]; then
+          echo "Downloading engine from ${engineUrl}"
+          (cd "$workDir" && curl --progress-bar -L -O "${engineUrl}") 
+          zipped=$(find "${workDir}" -maxdepth 1 -name "*.zip")
+          unzip -qq "${zipped}" -d "${workDir}/engine"
+          rm "${zipped}"
+        fi
 
     - name: Convert projects to latest ivy version
       if: ${{ inputs.skipMigrateToLatestIvyVersion != 'true' }}
