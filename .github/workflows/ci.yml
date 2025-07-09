@@ -46,7 +46,7 @@ jobs:
       run: |
         export IVY_JAVA_HOME=$JAVA_HOME_21_X64
         engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
-        workDir=$(pwd)
+        echo "workDir=$(pwd)" >> $GITHUB_ENV
         DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
         if [ -z "$workDir" ]; then
           workDir=$(mktemp -d -t projectConvertXXX)
@@ -63,12 +63,12 @@ jobs:
           rm "${zipped}"
         fi
         echo "workDir: $workDir"
-        echo "workDir=$workDir" >> $GITHUB_ENV
+        echo "tempDir=$workDir" >> $GITHUB_ENV
 
     - name: Convert projects to latest ivy version
       if: ! ${{ inputs.migrateToLatestIvyVersion}}
       run: |
-        echo "workDir: $workDir"
+        echo "workDir: $tempDir"
         gitDir=$(pwd)
         gitName=$(basename ${gitDir})
         echo "Searching projects in ${gitDir}"
@@ -82,7 +82,7 @@ jobs:
         done
         if [ ${#projects[@]} -gt 0 ]; then
           echo "Collected projects: ${projects[@]}"
-          ${workDir}/engine/bin/EngineConfigCli migrate-project ${projects[@]}
+          ${tempDir}/engine/bin/EngineConfigCli migrate-project ${projects[@]}
         fi
 
     - name: Build with Maven
