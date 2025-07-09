@@ -46,7 +46,7 @@ jobs:
       run: |
         export IVY_JAVA_HOME=$JAVA_HOME_21_X64
         engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
-        workDir=$(pwd)"
+        workDir=$(pwd)
         DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
         if [ -z "$workDir" ]; then
           workDir=$(mktemp -d -t projectConvertXXX)
