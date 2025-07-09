@@ -62,6 +62,12 @@ jobs:
           unzip -qq "${zipped}" -d "${workDir}/engine"
           rm "${zipped}"
         fi
+        echo "workDir: $workDir"
+
+    - name: Convert projects to latest ivy version
+      if: ! ${{ inputs.migrateToLatestIvyVersion}}
+      run: |
+        echo "workDir: $workDir"
         gitDir=$(pwd)
         gitName=$(basename ${gitDir})
         echo "Searching projects in ${gitDir}"
