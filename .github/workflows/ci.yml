@@ -46,7 +46,7 @@ jobs:
         DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
         if [ -z "$workDir" ]; then
           workDir=$(mktemp -d -t projectConvertXXX)
-          echo "$workDir"
+          echo "workDir: $workDir"
         fi
         if [ -z "$gitDir" ]; then
           gitDir="$DIR/repos"
