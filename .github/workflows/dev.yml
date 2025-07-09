@@ -34,6 +34,6 @@ jobs:
       javaVersion: 21
       mvnVersion: 3.9.8
       ivyVersion: ${{ inputs.ivyVersion }}
-      skipMigrateToLatestIvyVersion: "false"
+      migrateToLatestIvyVersion: true
     secrets:
       mvnArgs: '${{ secrets.mvnArgs }}'
