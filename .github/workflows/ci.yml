@@ -12,6 +12,10 @@ on:
       mvnVersion:
         type: string
         default: 3.9.8
+      ivyVersion:
+        type: string
+        default: dev
+        description: the ivy version to use (e.g. dev/nightly/nightly-10/...)
       skipMigrateToLatestIvyVersion:
         type: string
         default: 'true'
@@ -60,6 +64,9 @@ jobs:
           rm "${zipped}"
         fi
 
+    - name: Convert projects to latest ivy version
+      if: ${{ inputs.skipMigrateToLatestIvyVersion != 'true' }}
+      run: |
         gitDir=$(pwd)
         gitName=$(basename ${gitDir})
         echo "Searching projects in ${gitDir}"
