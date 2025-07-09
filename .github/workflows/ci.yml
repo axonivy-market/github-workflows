@@ -50,7 +50,6 @@ jobs:
         DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
         if [ -z "$workDir" ]; then
           workDir=$(mktemp -d -t projectConvertXXX)
-          echo "workDir: $workDir"
         fi
         if [ -z "$gitDir" ]; then
           gitDir="$DIR/repos"
@@ -63,6 +62,7 @@ jobs:
           unzip -qq "${zipped}" -d "${workDir}/engine"
           rm "${zipped}"
         fi
+        echo "workDir: $workDir"
 
     - name: Convert projects to latest ivy version
       if: ! ${{ inputs.migrateToLatestIvyVersion}}
