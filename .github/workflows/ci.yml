@@ -60,9 +60,6 @@ jobs:
           rm "${zipped}"
         fi
 
-    - name: Convert projects to latest ivy version
-      if: ${{ inputs.skipMigrateToLatestIvyVersion != 'true' }}
-      run: |
         gitDir=$(pwd)
         gitName=$(basename ${gitDir})
         echo "Searching projects in ${gitDir}"
