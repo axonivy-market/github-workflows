@@ -46,7 +46,7 @@ jobs:
       run: |
         export IVY_JAVA_HOME=$JAVA_HOME_21_X64
         engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
-        echo "workDir=$(pwd)" >> $GITHUB_ENV
+        workDir=$(pwd)"
         DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
         if [ -z "$workDir" ]; then
           workDir=$(mktemp -d -t projectConvertXXX)
@@ -62,7 +62,7 @@ jobs:
           unzip -qq "${zipped}" -d "${workDir}/engine"
           rm "${zipped}"
         fi
-        echo "workDir: $workDir"
+        echo "workDir=$workDir" >> $GITHUB_ENV
 
     - name: Convert projects to latest ivy version
       if: ! ${{ inputs.migrateToLatestIvyVersion}}
