@@ -44,7 +44,6 @@ jobs:
     - name: Download latest ivy engine
       if: ! ${{ inputs.migrateToLatestIvyVersion}}
       run: |
-        export IVY_JAVA_HOME=$JAVA_HOME_21_X64
         engineUrl="https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip"
         echo "workDir=$(pwd)" >> $GITHUB_ENV
         DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -68,6 +67,7 @@ jobs:
     - name: Convert projects to latest ivy version
       if: ! ${{ inputs.migrateToLatestIvyVersion}}
       run: |
+        export IVY_JAVA_HOME=$JAVA_HOME_21_X64
         echo "workDir: $tempDir"
         gitDir=$(pwd)
         gitName=$(basename ${gitDir})
