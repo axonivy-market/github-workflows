@@ -23,6 +23,11 @@ on:
       mvnArgs:
         required: false
 
+permissions:
+  contents: read
+  actions: write
+  checks: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
