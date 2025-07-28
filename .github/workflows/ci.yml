@@ -88,7 +88,7 @@ jobs:
 
     - name: Check if test results exist
       id: check_test_files
-      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+      if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
       run: |
         if [[ "${{ hashFiles('**/target/*-reports/*.xml') }}" != "" ]]; then
           echo "exists=true" >> $GITHUB_OUTPUT
@@ -97,13 +97,13 @@ jobs:
         fi
 
     - name: Remove test summary files
-      if: steps.check_test_files.outputs.exists == 'true'
+      if: always() && steps.check_test_files.outputs.exists == 'true'
       run: rm -f **/target/*-reports/*-summary.xml
 
     - name: Publish Unit Test Results with dorny/test-reporter 
       id: test_report
       uses: dorny/test-reporter@v1.9.1
-      if: steps.check_test_files.outputs.exists == 'true'
+      if: always() && steps.check_test_files.outputs.exists == 'true'
       with:
         name: JUnit Test Results
         reporter: java-junit
@@ -111,14 +111,14 @@ jobs:
         fail-on-error: 'false'
 
     - name: Export test results to json file
-      if: steps.check_test_files.outputs.exists == 'true'
+      if: always() && steps.check_test_files.outputs.exists == 'true'
       run: |
         response=$(curl ${{ steps.test_report.outputs.url }})
         echo $response > test_report.json
 
     - name: Archive test json file
       uses: actions/upload-artifact@v4
-      if: steps.check_test_files.outputs.exists == 'true'
+      if: always() && steps.check_test_files.outputs.exists == 'true'
       with:
         name: export-test-json-file
         retention-days: 5
@@ -126,6 +126,7 @@ jobs:
 
     - name: Publish Unit Test Results with EnricoMi
       uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
       with:
         files: |
           */target/*-reports/*.xml
