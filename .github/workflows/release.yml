@@ -9,6 +9,9 @@ on:
       mvnVersion:
         type: string
         default: 3.9.8
+      mvnArgs:
+        type: string
+        required: false
 
 jobs:
   build:
@@ -42,7 +45,7 @@ jobs:
     - name: Build with Maven
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn --batch-mode -Darguments="-Dmaven.test.skip=true -DaltDeploymentRepository=github::https://maven.pkg.github.com/axonivy-market/${{ github.event.repository.name }}" release:prepare release:perform
+      run: mvn --batch-mode -Darguments="-Dmaven.test.skip=true -DaltDeploymentRepository=github::https://maven.pkg.github.com/axonivy-market/${{ github.event.repository.name }}" release:prepare release:perform ${{ inputs.mvnArgs }}
 
     - name: Create pull request
       uses: repo-sync/pull-request@v2
