@@ -55,3 +55,4 @@ jobs:
         pr_title: "Release"
         github_token: ${{ secrets.GITHUB_TOKEN }}
         pr_assignee: ${{ github.actor }}
+        pr_label: "skip-changelog"
