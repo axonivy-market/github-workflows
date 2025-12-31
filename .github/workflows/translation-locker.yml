@@ -3,6 +3,9 @@ name: Translation Locker
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   prevent-modification:
     runs-on: ubuntu-latest
