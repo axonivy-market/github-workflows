@@ -29,8 +29,39 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+
+    - name: Check translations by non-weblate author
+      run: |
+        if [ -n "${{ github.event.pull_request.user.login }}" ]; then
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          EVENT_TYPE="pull_request"
+        elif [ -n "${{ github.event.pusher.name }}" ]; then
+          AUTHOR="${{ github.event.pusher.name }}"
+          EVENT_TYPE="push"
+        elif [ -n "${{ github.event.sender.login }}" ]; then
+          AUTHOR="${{ github.event.sender.login }}"
+          EVENT_TYPE="workflow_dispatch_or_other"
+        else
+          AUTHOR="${{ github.actor }}"
+          EVENT_TYPE="fallback"
+        fi
+
+        if [ "$AUTHOR" = "weblate" ]; then
+          echo "✓ Author is weblate, bypassing README_DE.md check"
+        else
+          echo "Author is not weblate ($AUTHOR), checking README_DE.md modifications"
+          BASE_BRANCH="${{ github.event.repository.default_branch }}"
+
+          git fetch origin $BASE_BRANCH
+          if git ls-tree -r origin/$BASE_BRANCH --name-only | grep -q 'README_DE\.md$'; then
+            if ! git diff --exit-code origin/$BASE_BRANCH...HEAD -- '**/README_DE.md'; then
+              echo "⚠ ERROR: Modification of README_DE.md is not allowed."
+              exit 1
+            fi
+          else
+            echo "✓ README_DE.md does not exist on default branch, file can be created."
+          fi
+        fi
 
     - name: Setup Java JDK
       uses: actions/setup-java@v4
@@ -83,33 +114,6 @@ jobs:
         if [ ${#projects[@]} -gt 0 ]; then
           echo "Collected projects: ${projects[@]}"
           ${workDir}/engine/bin/EngineConfigCli migrate-project ${projects[@]}
-        fi
-
-    - name: Check PR author
-      id: check_author
-      run: |
-        PR_AUTHOR="${{ github.event.pull_request.user.login }}"
-        echo "PR author: $PR_AUTHOR"
-        if [ "$PR_AUTHOR" = "weblate" ]; then
-            echo "✓ Author is weblate, bypassing README_DE.md check"
-            echo "bypass=true" >> $GITHUB_OUTPUT
-          else
-            echo "Author is not weblate, will check README_DE.md modifications"
-            echo "bypass=false" >> $GITHUB_OUTPUT
-          fi
-
-    - name: Check if README_DE.md existed on default branch
-      if: steps.check_author.outputs.bypass != 'true'
-      run: |
-        git fetch origin ${{ github.base_ref }}
-        if git ls-tree -r origin/${{ github.base_ref }} --name-only | grep -q 'README_DE\.md$'; then
-          echo "README_DE.md exists, checking for modification"
-          if ! git diff --exit-code origin/${{ github.base_ref }}...HEAD -- '**/README_DE.md'; then
-            echo "⚠ ERROR: Modification of README_DE.md is not allowed."
-            exit 1
-          fi
-        else
-          echo "✓ README_DE.md does not exist on default branch, file can be created."
         fi
 
     - name: Build with Maven
