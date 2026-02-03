@@ -19,9 +19,6 @@ on:
       ivyPluginVersion:
         type: string
         default: 14.0.0-SNAPSHOT
-      testerVersion:
-        type: string
-        default: 14.0.0-SNAPSHOT
     secrets:
       mvnArgs:
         required: false
