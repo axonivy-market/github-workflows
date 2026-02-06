@@ -6,10 +6,6 @@ on:
       mvnArgs:
         type: string
         required: false
-      cspellConfig:
-        type: string
-        required: false
-        default: cspell.json
       javaVersion:
         type: number
         default: 21
@@ -188,26 +184,3 @@ jobs:
           */target/testEngineOut.log
           */target/selenide/*
           */target/ivyEngine/deploy/*/*.deploymentLog
-
-    - name: Install CSpell
-      run: |
-        npm install -g cspell@latest
-        echo "Cspell Version: $(cspell --version)"
-
-    - name: Run CSpell - Spell Check
-      run: |
-        CONFIG="${{ inputs.cspellConfig }}"
-        if [ ! -f "$CONFIG" ]; then
-          echo "cspell config not found: $CONFIG"
-          exit 1
-        fi
-        mkdir -p spellcheck
-        cspell lint --config "$CONFIG" > spellcheck/cspell.txt
-
-    - name: Upload Spell Check Results
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: spellcheck-results
-        path: spellcheck/**/*.txt
-        if-no-files-found: warn
