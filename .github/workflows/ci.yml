@@ -6,6 +6,10 @@ on:
       mvnArgs:
         type: string
         required: false
+      cspellExtraWords:
+        type: string
+        required: false
+        description: Path to text file with additional cspell words
       javaVersion:
         type: number
         default: 21
@@ -184,3 +188,107 @@ jobs:
           */target/testEngineOut.log
           */target/selenide/*
           */target/ivyEngine/deploy/*/*.deploymentLog
+
+    # -------------------------------------------------
+    # Install & Run CSpell
+    # -------------------------------------------------
+    - name: Install CSpell
+      run: |
+        npm install -g cspell@latest
+        cspell --version
+
+    - name: Read extra cspell words from txt
+      id: extra_cspell_words
+      if: inputs.cspellExtraWords != ''
+      run: |
+        FILE="${{ inputs.cspellExtraWords }}"
+
+        if [ ! -f "$FILE" ]; then
+          echo "Extra cspell words file not found: $FILE"
+          exit 1
+        fi
+
+        # Normalize:
+        # - split by comma or newline
+        # - trim spaces
+        # - remove empty lines
+        # - wrap each word with quotes
+        WORDS=$(cat "$FILE" \
+          | tr ',\n' '\n' \
+          | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
+          | sed '/^$/d' \
+          | sed 's/.*/"&"/' \
+          | paste -sd, -)
+
+        echo "json_words=$WORDS" >> $GITHUB_OUTPUT
+
+    - name: Create custom cspell config
+      run: |
+        EXTRA_WORDS='${{ steps.extra_cspell_words.outputs.json_words }}'
+
+        if [ -n "$EXTRA_WORDS" ]; then
+          EXTRA_BLOCK=", $EXTRA_WORDS"
+        else
+          EXTRA_BLOCK=""
+        fi
+
+        cat > cspell.json <<EOF
+        {
+          "version": "0.2",
+          "files": [
+            "**/*.md",
+            "**/*_en.yaml",
+            "**/variables.yaml",
+            "**/*.xhtml"
+          ],
+          "ignorePaths": [
+            "**/*_de.md",
+            "**/*_DE.md",
+            "**/webContent/layouts/frame*.xhtml",
+            "**/webContent/layouts/basic*.xhtml",
+            "**/webContent/layouts/includes/*.xhtml"
+          ],
+          "words": [
+            "AxonIvy", "axonactive", "ivy", "ivyteam", "wawa", "Up2date",
+            "e2e", "panelgrid", "toggleable", "orderlist", "tablewrapper",
+            "hoverable", "gridlines", "formgrid", "maxdate", "mindate",
+            "chkbox", "confirmdialog", "maximizable", "outputlabel",
+            "webcontent", "Unsorting", "nogutter", "navicon", "HANA",
+            "Recordset", "Recordsets", "fileref", "newkey", "ESIGN",
+            "keyout", "inkey", "Aspose", "primeflex", "primefaces",
+            "dynaForm", "dyna", "Startable", "caseprocessviewer", "EMLX",
+            "visualvm", "vertexai", "webservice", "apikey", "talentlink",
+            "Successfactors", "statefuldatatable", "datatable", "Threema",
+            "threemaid", "Keypair", "azureopenai", "Skribble", "SFTP",
+            "rebex", "sshkey", "Keyphrase", "sshpassphrase", "patterndemos",
+            "suneditor", "chartjs", "datalabels", "metaproc", "masterdetail",
+            "Weblate", "mailstore", "XOAUTH", "sasl", "imap", "imaps",
+            "clazz", "intellix", "Hubspot", "Genderize", "formeditordemos",
+            "DocuWare", "filecabinetid", "DocuSign", "daemonless", "npipe",
+            "docfactory", "deepl", "glassfish", "HSQL", "hsqldb", "Liquibase",
+            "cmseditor", "casemailcomponent", "nbsp", "Servicebus", "axonivypdf",
+            "axonivyexpress", "axonivycells", "approvaldecision", "Analyser",
+            "chatbots", "aiassistant", "adobesign", "atrust", "SOQL",
+            "HandySignatur", "handy-signatur", "SignaturBox", "Signatur-Box"
+            $EXTRA_BLOCK
+          ]
+        }
+        EOF
+
+    - name: Debug cspell config
+      run: |
+        echo "===== cspell.json ====="
+        cat cspell.json
+
+    - name: Run CSpell - Spell Check
+      run: |
+        cspell lint --config cspell.json > spellcheck.txt
+
+
+    - name: Upload Spell Check Results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: spellcheck-results
+        path: spellcheck.txt
+        if-no-files-found: warn
