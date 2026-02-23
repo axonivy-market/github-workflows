@@ -19,6 +19,9 @@ on:
       migrateToLatestIvyVersion :
         type: boolean
         default: false
+      ivyJavaHome:
+        type: string
+        default: $JAVA_HOME_21_X64
     secrets:
       mvnArgs:
         required: false
@@ -99,7 +102,7 @@ jobs:
     - name: Convert projects to latest ivy version
       if: ! ${{ inputs.migrateToLatestIvyVersion}}
       run: |
-        export IVY_JAVA_HOME=$JAVA_HOME_21_X64
+        export IVY_JAVA_HOME=${{ inputs.ivyJavaHome }}
         gitDir=$(pwd)
         gitName=$(basename ${gitDir})
         echo "Searching projects in ${gitDir}"
