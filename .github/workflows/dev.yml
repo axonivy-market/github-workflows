@@ -19,6 +19,9 @@ on:
       ivyPluginVersion:
         type: string
         default: 14.0.0-SNAPSHOT
+      ivyJavaHome:
+        type: string
+        default: $JAVA_HOME_25_X64
     secrets:
       mvnArgs:
         required: false
@@ -31,6 +34,7 @@ jobs:
       javaVersion: 25
       mvnVersion: 3.9.8
       ivyVersion: ${{ inputs.ivyVersion }}
+      ivyJavaHome: $JAVA_HOME_25_X64
       migrateToLatestIvyVersion: true
     secrets:
       mvnArgs: '${{ secrets.mvnArgs }}'
