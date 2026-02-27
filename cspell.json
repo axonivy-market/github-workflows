@@ -35,6 +35,5 @@
 	"axonivyexpress", "axonivycells", "approvaldecision", "Analyser",
 	"chatbots", "aiassistant", "adobesign", "atrust", "SOQL",
 	"HandySignatur", "handy-signatur", "SignaturBox", "Signatur-Box"
-	$EXTRA_BLOCK
   ]
 }

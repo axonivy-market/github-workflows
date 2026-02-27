@@ -190,12 +190,18 @@ jobs:
           */target/ivyEngine/deploy/*/*.deploymentLog
 
     # -------------------------------------------------
-    # Install & Run CSpell
+    # Install & Run CSpell (Shared Config)
     # -------------------------------------------------
+
     - name: Install CSpell
       run: |
         npm install -g cspell@latest
         cspell --version
+
+    - name: Download shared cspell config
+      run: |
+        curl -L -o cspell.json \
+          https://raw.githubusercontent.com/axonivy-market/github-workflows/feature/MARP-3642-How-to-handle-spelling-errors/cspell.json
 
     - name: Read extra cspell words from txt
       id: extra_cspell_words
@@ -208,72 +214,20 @@ jobs:
           exit 1
         fi
 
-        # Normalize:
-        # - split by comma or newline
-        # - trim spaces
-        # - remove empty lines
-        # - wrap each word with quotes
         WORDS=$(cat "$FILE" \
           | tr ',\n' '\n' \
           | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
           | sed '/^$/d' \
-          | sed 's/.*/"&"/' \
           | paste -sd, -)
 
-        echo "json_words=$WORDS" >> $GITHUB_OUTPUT
+        echo "extra_words=$WORDS" >> $GITHUB_OUTPUT
 
-    - name: Create custom cspell config
+    - name: Append extra words to cspell.json
+      if: inputs.cspellExtraWords != ''
       run: |
-        EXTRA_WORDS='${{ steps.extra_cspell_words.outputs.json_words }}'
-
-        if [ -n "$EXTRA_WORDS" ]; then
-          EXTRA_BLOCK=", $EXTRA_WORDS"
-        else
-          EXTRA_BLOCK=""
-        fi
-
-        cat > cspell.json <<EOF
-        {
-          "version": "0.2",
-          "files": [
-            "**/*.md",
-            "**/*_en.yaml",
-            "**/variables.yaml",
-            "**/*.xhtml"
-          ],
-          "ignorePaths": [
-            "**/*_de.md",
-            "**/*_DE.md",
-            "**/webContent/layouts/frame*.xhtml",
-            "**/webContent/layouts/basic*.xhtml",
-            "**/webContent/layouts/includes/*.xhtml"
-          ],
-          "words": [
-            "AxonIvy", "axonactive", "ivy", "ivyteam", "wawa", "Up2date",
-            "e2e", "panelgrid", "toggleable", "orderlist", "tablewrapper",
-            "hoverable", "gridlines", "formgrid", "maxdate", "mindate",
-            "chkbox", "confirmdialog", "maximizable", "outputlabel",
-            "webcontent", "Unsorting", "nogutter", "navicon", "HANA",
-            "Recordset", "Recordsets", "fileref", "newkey", "ESIGN",
-            "keyout", "inkey", "Aspose", "primeflex", "primefaces",
-            "dynaForm", "dyna", "Startable", "caseprocessviewer", "EMLX",
-            "visualvm", "vertexai", "webservice", "apikey", "talentlink",
-            "Successfactors", "statefuldatatable", "datatable", "Threema",
-            "threemaid", "Keypair", "azureopenai", "Skribble", "SFTP",
-            "rebex", "sshkey", "Keyphrase", "sshpassphrase", "patterndemos",
-            "suneditor", "chartjs", "datalabels", "metaproc", "masterdetail",
-            "Weblate", "mailstore", "XOAUTH", "sasl", "imap", "imaps",
-            "clazz", "intellix", "Hubspot", "Genderize", "formeditordemos",
-            "DocuWare", "filecabinetid", "DocuSign", "daemonless", "npipe",
-            "docfactory", "deepl", "glassfish", "HSQL", "hsqldb", "Liquibase",
-            "cmseditor", "casemailcomponent", "nbsp", "Servicebus", "axonivypdf",
-            "axonivyexpress", "axonivycells", "approvaldecision", "Analyser",
-            "chatbots", "aiassistant", "adobesign", "atrust", "SOQL",
-            "HandySignatur", "handy-signatur", "SignaturBox", "Signatur-Box"
-            $EXTRA_BLOCK
-          ]
-        }
-        EOF
+        for word in $(echo "${{ steps.extra_cspell_words.outputs.extra_words }}"); do
+          jq ".words += [\"$word\"]" cspell.json > tmp.json && mv tmp.json cspell.json
+        done
 
     - name: Debug cspell config
       run: |
@@ -281,14 +235,24 @@ jobs:
         cat cspell.json
 
     - name: Run CSpell - Spell Check
+      id: run_cspell
       run: |
+        set +e
         cspell lint --config cspell.json > spellcheck.txt
-
+        EXIT_CODE=$?
+        echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+        exit 0
 
     - name: Upload Spell Check Results
-      if: failure()
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: spellcheck-results
         path: spellcheck.txt
         if-no-files-found: warn
+
+    - name: Fail build if spelling errors found
+      if: steps.run_cspell.outputs.exit_code != '0'
+      run: |
+        echo "❌ Spelling errors detected"
+        exit 1
