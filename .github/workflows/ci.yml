@@ -6,6 +6,10 @@ on:
       mvnArgs:
         type: string
         required: false
+      cspellExtraWords:
+        type: string
+        required: false
+        description: Path to text file with additional cspell words
       javaVersion:
         type: number
         default: 21
@@ -187,3 +191,48 @@ jobs:
           */target/testEngineOut.log
           */target/selenide/*
           */target/ivyEngine/deploy/*/*.deploymentLog
+
+    # -------------------------------------------------
+    # Install & Run CSpell
+    # -------------------------------------------------
+    - name: Install CSpell
+      run: |
+        npm install -g cspell@latest
+        cspell --version
+
+    - name: Download shared cspell config
+      run: |
+        curl -L -o cspell.json \
+          https://raw.githubusercontent.com/axonivy-market/github-workflows/feature/MARP-3642-How-to-handle-spelling-errors/cspell.json
+
+    - name: Append extra cspell words
+      if: inputs.cspellExtraWords != ''
+      run: |
+        FILE="${{ inputs.cspellExtraWords }}"
+
+        if [ ! -f "$FILE" ]; then
+          echo "Extra cspell words file not found: $FILE"
+          exit 1
+        fi
+
+        jq --arg words "$(cat "$FILE")" '
+          .words += (
+            $words
+            | split(",")
+            | map(gsub("^\\s+|\\s+$"; ""))
+            | map(select(length > 0))
+          )
+        ' cspell.json > tmp.json && mv tmp.json cspell.json
+
+    - name: Run CSpell - Spell Check
+      id: run_cspell
+      run: |
+        cspell lint --config cspell.json > spellcheck.txt
+
+    - name: Upload Spell Check Results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: spellcheck-results
+        path: spellcheck.txt
+        if-no-files-found: warn
