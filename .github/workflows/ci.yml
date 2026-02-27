@@ -203,8 +203,7 @@ jobs:
         curl -L -o cspell.json \
           https://raw.githubusercontent.com/axonivy-market/github-workflows/feature/MARP-3642-How-to-handle-spelling-errors/cspell.json
 
-    - name: Read extra cspell words from txt
-      id: extra_cspell_words
+    - name: Append extra cspell words
       if: inputs.cspellExtraWords != ''
       run: |
         FILE="${{ inputs.cspellExtraWords }}"
@@ -214,32 +213,14 @@ jobs:
           exit 1
         fi
 
-        WORDS=$(cat "$FILE" \
-          | tr ',\n' '\n' \
-          | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
-          | sed '/^$/d' \
-          | paste -sd, -)
-
-        echo "extra_words=$WORDS" >> $GITHUB_OUTPUT
-
-    - name: Append extra words to cspell.json
-      if: inputs.cspellExtraWords != ''
-      run: |
-        FILE="${{ inputs.cspellExtraWords }}"
-
-        if [ ! -f "$FILE" ]; then
-          echo "Extra cspell words file not found: $FILE"
-          exit 1
-        fi
-
-        WORDS_JSON=$(cat "$FILE" \
-          | tr -d '\n' \
-          | sed 's/[[:space:]]//g' \
-          | jq -R 'split(",")')
-
-        jq --argjson words "$WORDS_JSON" \
-          '.words += $words' \
-          cspell.json > tmp.json && mv tmp.json cspell.json
+        jq --arg words "$(cat "$FILE")" '
+          .words += (
+            $words
+            | split(",")
+            | map(gsub("^\\s+|\\s+$"; ""))
+            | map(select(length > 0))
+          )
+        ' cspell.json > tmp.json && mv tmp.json cspell.json
 
     - name: Debug cspell config
       run: |
