@@ -190,9 +190,8 @@ jobs:
           */target/ivyEngine/deploy/*/*.deploymentLog
 
     # -------------------------------------------------
-    # Install & Run CSpell (Shared Config)
+    # Install & Run CSpell
     # -------------------------------------------------
-
     - name: Install CSpell
       run: |
         npm install -g cspell@latest
@@ -221,11 +220,6 @@ jobs:
             | map(select(length > 0))
           )
         ' cspell.json > tmp.json && mv tmp.json cspell.json
-
-    - name: Debug cspell config
-      run: |
-        echo "===== cspell.json ====="
-        cat cspell.json
 
     - name: Run CSpell - Spell Check
       id: run_cspell

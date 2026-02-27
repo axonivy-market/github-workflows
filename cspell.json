@@ -19,21 +19,11 @@
 	"hoverable", "gridlines", "formgrid", "maxdate", "mindate",
 	"chkbox", "confirmdialog", "maximizable", "outputlabel",
 	"webcontent", "Unsorting", "nogutter", "navicon", "HANA",
-	"Recordset", "Recordsets", "fileref", "newkey", "ESIGN",
-	"keyout", "inkey", "Aspose", "primeflex", "primefaces",
-	"dynaForm", "dyna", "Startable", "caseprocessviewer", "EMLX",
-	"visualvm", "vertexai", "webservice", "apikey", "talentlink",
-	"Successfactors", "statefuldatatable", "datatable", "Threema",
-	"threemaid", "Keypair", "azureopenai", "Skribble", "SFTP",
-	"rebex", "sshkey", "Keyphrase", "sshpassphrase", "patterndemos",
-	"suneditor", "chartjs", "datalabels", "metaproc", "masterdetail",
-	"Weblate", "mailstore", "XOAUTH", "sasl", "imap", "imaps",
-	"clazz", "intellix", "Hubspot", "Genderize", "formeditordemos",
-	"DocuWare", "filecabinetid", "DocuSign", "daemonless", "npipe",
-	"docfactory", "deepl", "glassfish", "HSQL", "hsqldb", "Liquibase",
-	"cmseditor", "casemailcomponent", "nbsp", "Servicebus", "axonivypdf",
-	"axonivyexpress", "axonivycells", "approvaldecision", "Analyser",
-	"chatbots", "aiassistant", "adobesign", "atrust", "SOQL",
-	"HandySignatur", "handy-signatur", "SignaturBox", "Signatur-Box"
+	"Recordset", "Recordsets", "fileref","keyout", "inkey",
+	"primeflex", "primefaces","dynaForm", "dyna", "Startable",
+	"caseprocessviewer", "EMLX",  "apikey","Successfactors", "datatable",
+	"rebex", "sshkey", "Keyphrase", "sshpassphrase", "suneditor",
+	"chartjs", "datalabels", "masterdetail","Weblate", "XOAUTH", "sasl", "imap",
+	"imaps", "clazz", "filecabinetid", "daemonless", "npipe"
   ]
 }
