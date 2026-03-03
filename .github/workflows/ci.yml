@@ -6,6 +6,11 @@ on:
       mvnArgs:
         type: string
         required: false
+      cspellConfigUrl:
+        type: string
+        required: false
+        description: Optional URL to shared cspell.json
+        default: https://raw.githubusercontent.com/axonivy-market/github-workflows/feature/MARP-3642-How-to-handle-spelling-errors/cspell.json
       cspellExtraWords:
         type: string
         required: false
@@ -199,8 +204,7 @@ jobs:
 
     - name: Download shared cspell config
       run: |
-        curl -L -o cspell.json \
-          https://raw.githubusercontent.com/axonivy-market/github-workflows/feature/MARP-3642-How-to-handle-spelling-errors/cspell.json
+        curl -L -o cspell.json "${{ inputs.cspellConfigUrl }}"
 
     - name: Append extra cspell words
       if: inputs.cspellExtraWords != ''
