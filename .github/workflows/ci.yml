@@ -199,12 +199,12 @@ jobs:
     # -------------------------------------------------
     - name: Install CSpell
       run: |
-        npm install -g cspell@latest
+        npm install -g cspell@8.15.4
         cspell --version
 
     - name: Download shared cspell config
       run: |
-        curl -L -o cspell.json "${{ inputs.cspellConfigUrl }}"
+        curl --fail --location --retry 3 --retry-delay 5 --output cspell.json "${{ inputs.cspellConfigUrl }}"
 
     - name: Append extra cspell words
       if: inputs.cspellExtraWords != ''
