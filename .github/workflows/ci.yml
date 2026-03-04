@@ -10,7 +10,7 @@ on:
         type: string
         required: false
         description: Optional URL to shared cspell.json
-        default: https://raw.githubusercontent.com/axonivy-market/github-workflows/feature/MARP-3642-How-to-handle-spelling-errors/cspell.json
+        default: https://raw.githubusercontent.com/axonivy-market/github-workflows/master/cspell.json
       cspellExtraWords:
         type: string
         required: false
