@@ -232,4 +232,4 @@ jobs:
       id: run_cspell
       run: |
         echo "Running CSpell..."
-        cspell lint --config cspell.json "**" --no-progress
+        cspell lint --config cspell.json --no-progress
