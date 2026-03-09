@@ -234,6 +234,5 @@ jobs:
         echo "Running CSpell..."
         
         cspell lint --config cspell.json --no-progress 2>&1 \
-        | sed -E "s|[0-9]. (WARNING) in ([^ ]*) \(at line ([0-9]+)\)(.*)|::\L\1 file=\2,line=\3::build issue\n\2@\3\4|g" \
-        | sed -E "s|\[WARNING\] |::warning::|g" \
+        | sed -E 's|^([^:]+):([0-9]+):[0-9]+ - (.*)$|::warning file=\1,line=\2::\3|' \
         || true
