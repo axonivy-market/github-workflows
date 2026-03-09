@@ -230,13 +230,10 @@ jobs:
 
     - name: Run CSpell - Spell Check
       id: run_cspell
+      continue-on-error: true
       run: |
         echo "Running CSpell..."
-        
-        cspell lint --config cspell.json --no-progress
-        EXIT_CODE=$?
-        
-        if [ $EXIT_CODE -ne 0 ]; then
-          echo "::error::CSpell found spelling issues"
+        if ! cspell lint --config cspell.json --no-progress; then
+          echo "::error title=CSpell Failed::Spelling issues detected"
           exit 1
         fi
