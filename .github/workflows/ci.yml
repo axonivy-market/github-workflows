@@ -230,7 +230,13 @@ jobs:
 
     - name: Run CSpell - Spell Check
       id: run_cspell
-      continue-on-error: true
       run: |
         echo "Running CSpell..."
-        cspell lint --config cspell.json --no-progress
+        cspell lint --config cspell.json --no-progress || echo "cspell_exit=$?" >> $GITHUB_OUTPUT
+        
+    - name: Highlight CSpell Errors
+      if: steps.cspell.outputs.cspell_exit != ''
+      continue-on-error: true
+      run: |
+        echo "❌ Spelling errors detected by CSpell"
+        exit 1
