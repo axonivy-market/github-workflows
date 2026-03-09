@@ -233,8 +233,6 @@ jobs:
       continue-on-error: true
       run: |
         echo "Running CSpell..."
-        
         if ! cspell lint --config cspell.json --no-progress; then
-          echo "::warning title=CSpell Warning::Spelling issues detected (see details below)"
-          cspell lint --config cspell.json --no-progress
+          echo "::warning title=CSpell Warning::Spelling issues detected"
         fi
