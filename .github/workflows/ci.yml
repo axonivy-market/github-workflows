@@ -229,6 +229,10 @@ jobs:
         ' cspell.json > tmp.json && mv tmp.json cspell.json
 
     - name: Run CSpell - Spell Check
-      continue-on-error: true
+      id: run_cspell
       run: |
-        cspell lint --config cspell.json --no-progress --format github-actions
+        echo "Running CSpell..."
+        
+        if ! cspell lint --config cspell.json --no-progress; then
+          echo "::warning title=CSpell Warning::Spelling issues detected"
+        fi
