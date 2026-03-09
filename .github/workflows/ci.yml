@@ -230,9 +230,6 @@ jobs:
 
     - name: Run CSpell - Spell Check
       id: run_cspell
+      continue-on-error: true
       run: |
-        echo "Running CSpell..."
-        
-        if ! cspell lint --config cspell.json --no-progress; then
-          echo "::warning title=CSpell Warning::Spelling issues detected"
-        fi
+        cspell lint --config cspell.json --no-progress
