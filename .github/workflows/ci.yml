@@ -218,11 +218,11 @@ jobs:
 
         if [ ! -f "$FILE" ]; then
           if [ "$FILE" = "$DEFAULT_FILE" ]; then
-            echo "Default extra words file not found ($FILE). Skipping..."
+            echo "::warning file=$FILE::Default extra words file not found. Skipping append."
             exit 0
           else
-            echo "Custom extra words file not found: $FILE"
-            exit 1
+            echo "::warning file=$FILE::Custom extra words file not found."
+            exit 0
           fi
         fi
 
