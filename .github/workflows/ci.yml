@@ -222,6 +222,7 @@ jobs:
           else
             echo "::warning::Custom extra words file not found ($FILE)."
           fi
+          exit 0
         fi
 
         echo "Appending extra words from $FILE"
