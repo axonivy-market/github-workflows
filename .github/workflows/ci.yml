@@ -211,6 +211,7 @@ jobs:
         curl --fail --location --retry 3 --retry-delay 5 --output cspell.json "${{ inputs.cspellConfigUrl }}"
 
     - name: Append extra cspell words
+      continue-on-error: true
       run: |
         FILE="${{ inputs.cspellExtraWords }}"
         DEFAULT_FILE=".github/cspell-extra-words.txt"
