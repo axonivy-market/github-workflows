@@ -15,6 +15,7 @@ on:
         type: string
         required: false
         description: Path to text file with additional cspell words
+        default: .github/cspell-extra-words.txt
       javaVersion:
         type: number
         default: 21
@@ -231,12 +232,7 @@ jobs:
     - name: Run CSpell - Spell Check
       id: run_cspell
       run: |
-        cspell lint --config cspell.json > spellcheck.txt
-
-    - name: Upload Spell Check Results
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: spellcheck-results
-        path: spellcheck.txt
-        if-no-files-found: warn
+        echo "Running CSpell..."
+        cspell lint --config cspell.json --no-progress 2>&1 \
+        | sed -E 's|^([^:]+):([0-9]+):[0-9]+ - (.*)$|::warning file=\1,line=\2::1. WARNING in \1 (at line \2) \3|' \
+        || true

@@ -24,6 +24,6 @@
 	"caseprocessviewer", "EMLX",  "apikey","Successfactors", "datatable",
 	"rebex", "sshkey", "Keyphrase", "sshpassphrase", "suneditor",
 	"chartjs", "datalabels", "masterdetail","Weblate", "XOAUTH", "sasl", "imap",
-	"imaps", "clazz", "filecabinetid", "daemonless", "npipe"
+	"imaps", "clazz", "filecabinetid", "daemonless", "npipe", "onupload"
   ]
 }
