@@ -43,7 +43,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Check translations by non-weblate author
+    - name: Check translations by non-Weblate author
+      continue-on-error: true
       run: |
         if [ -n "${{ github.event.pull_request.user.login }}" ]; then
           AUTHOR="${{ github.event.pull_request.user.login }}"
@@ -77,7 +78,6 @@ jobs:
         fi
 
     - name: Setup Java JDK
-      continue-on-error: true
       uses: actions/setup-java@v4
       with:
         java-version: ${{ inputs.javaVersion }}
