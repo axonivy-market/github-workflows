@@ -115,13 +115,14 @@ jobs:
 
     - name: Publish Unit Test Results with dorny/test-reporter 
       id: test_report
-      uses: dorny/test-reporter@v3
+      uses: dorny/test-reporter@v3.0.0
       if: always() && steps.check_test_files.outputs.exists == 'true'
       with:
         name: JUnit Test Results
         reporter: java-junit
         path: '**/target/*-reports/*.xml'
         fail-on-error: 'false'
+        use-actions-summary: 'false'
 
     - name: Export test results to json file
       if: always() && steps.check_test_files.outputs.exists == 'true'
