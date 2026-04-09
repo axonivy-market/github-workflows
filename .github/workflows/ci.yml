@@ -41,16 +41,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Setup Java JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: ${{ inputs.javaVersion }}
         distribution: temurin
 
     - name: Setup Maven
-      uses: stCarolas/setup-maven@v5
+      uses: stCarolas/setup-maven@v5.1
       with:
         maven-version: ${{ inputs.mvnVersion }}
 
@@ -115,7 +115,7 @@ jobs:
 
     - name: Publish Unit Test Results with dorny/test-reporter 
       id: test_report
-      uses: dorny/test-reporter@v1.9.1
+      uses: dorny/test-reporter@v3
       if: always() && steps.check_test_files.outputs.exists == 'true'
       with:
         name: JUnit Test Results
@@ -130,7 +130,7 @@ jobs:
         echo $response > test_report.json
 
     - name: Archive test json file
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       if: always() && steps.check_test_files.outputs.exists == 'true'
       with:
         name: export-test-json-file
@@ -138,7 +138,7 @@ jobs:
         path: 'test_report.json'
 
     - name: Publish Unit Test Results with EnricoMi
-      uses: EnricoMi/publish-unit-test-result-action@v2
+      uses: EnricoMi/publish-unit-test-result-action@v2.23.0
       if: always()
       with:
         files: |
@@ -147,7 +147,7 @@ jobs:
         action_fail: true
   
     - name: Archive build artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         path: |
           */target/*.iar
