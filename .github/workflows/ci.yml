@@ -138,7 +138,7 @@ jobs:
         path: 'test_report.json'
 
     - name: Publish Unit Test Results with EnricoMi
-      uses: EnricoMi/publish-unit-test-result-action@v2.23.0
+      uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
         files: |
@@ -155,7 +155,7 @@ jobs:
           *product/target/*.zip
 
     - name: Archive test reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       if: failure()
       with:
         name: test-reports
