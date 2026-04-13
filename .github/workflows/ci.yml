@@ -131,7 +131,7 @@ jobs:
         echo $response > test_report.json
 
     - name: Archive test json file
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       if: always() && steps.check_test_files.outputs.exists == 'true'
       with:
         name: export-test-json-file
@@ -148,7 +148,7 @@ jobs:
         action_fail: true
   
     - name: Archive build artifact
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         path: |
           */target/*.iar
@@ -156,7 +156,7 @@ jobs:
           *product/target/*.zip
 
     - name: Archive test reports
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       if: failure()
       with:
         name: test-reports
