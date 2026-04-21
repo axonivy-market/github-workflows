@@ -95,14 +95,6 @@ jobs:
           echo "Collected projects: ${projects[@]}"
           ${workDir}/engine/bin/EngineConfigCli migrate-project ${projects[@]}
         fi
-  
-    - name: Cleanup ivy engine
-      if: always() && !${{ inputs.migrateToLatestIvyVersion }}
-      run: |
-        if [ -n "$workDir" ] && [ -d "$workDir/engine" ]; then
-          echo "Removing ivy engine at $workDir/engine"
-          rm -rf "$workDir/engine"
-        fi
 
         if [ -n "$workDir" ] && [ -d "$workDir/engine" ]; then
           echo "Removing ivy engine at $workDir/engine"
