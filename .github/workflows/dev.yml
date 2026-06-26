@@ -35,6 +35,7 @@ jobs:
       mvnVersion: 3.9.8
       ivyVersion: ${{ inputs.ivyVersion }}
       ivyJavaHome: $JAVA_HOME_25_X64
+      targetBranch: dev/14.0
       migrateToLatestIvyVersion: true
     secrets:
       mvnArgs: '${{ secrets.mvnArgs }}'
