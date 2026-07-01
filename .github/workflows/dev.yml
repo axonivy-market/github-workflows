@@ -22,6 +22,11 @@ on:
       ivyJavaHome:
         type: string
         default: $JAVA_HOME_25_X64
+      targetBranchForBuildFromMaster:
+        type: string
+        required: false
+        description: branch name to check out instead of the current ref when building from master
+        default: dev/14.0
     secrets:
       mvnArgs:
         required: false
@@ -35,7 +40,7 @@ jobs:
       mvnVersion: 3.9.8
       ivyVersion: ${{ inputs.ivyVersion }}
       ivyJavaHome: $JAVA_HOME_25_X64
-      targetBranch: dev/14.0
+      targetBranch: ${{ github.ref == 'refs/heads/master' && inputs.targetBranchForBuildFromMaster || '' }}
       migrateToLatestIvyVersion: true
     secrets:
       mvnArgs: '${{ secrets.mvnArgs }}'
