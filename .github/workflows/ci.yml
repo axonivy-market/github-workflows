@@ -91,8 +91,17 @@ jobs:
         gitName=$(basename ${gitDir})
         echo "Searching projects in ${gitDir}"
         projects=()
+        # collect 13.2
         for ivyPref in $(find ${gitDir} -name "ch.ivyteam.ivy.designer.prefs"); do
           project=$(dirname $(dirname $ivyPref))
+          if ! [ -f "${project}/pom.xml" ]; then
+            continue # prefs file not in natural project structure
+          fi
+          projects+=("${project}")
+        done
+        # collect 14
+        for ivyPro in $(find ${gitDir} -name ".ivyproject"); do
+          project=$(dirname $ivyPro)
           if ! [ -f "${project}/pom.xml" ]; then
             continue # prefs file not in natural project structure
           fi
