@@ -1,5 +1,4 @@
-name: Release-Build-Dev-Template
-
+name: Release-Build-Dev
 permissions:
   actions: read
   contents: read
