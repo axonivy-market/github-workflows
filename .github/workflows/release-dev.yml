@@ -9,7 +9,7 @@ on:
     inputs:
       javaVersion:
         type: number
-        default: 25
+        default: 21
       mvnVersion:
         type: string
         default: 3.9.13
