@@ -16,9 +16,6 @@ on:
       mvnVersion:
         type: string
         default: 3.10.0
-      ivyPluginVersion:
-        type: string
-        default: 14.0.0
       ivyJavaHome:
         type: string
         default: $JAVA_HOME_25_X64
@@ -35,7 +32,7 @@ jobs:
   build:
     uses: axonivy-market/github-workflows/.github/workflows/ci.yml@v14
     with:
-      mvnArgs: '"-Divy.engine.download.url=https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip" "-Divy.engine.version=[14.0.0,]" "-Dproject.build.plugin.version=${{ inputs.ivyPluginVersion }}" ${{ inputs.mvnArgs }}'
+      mvnArgs: '"-Divy.engine.download.url=https://dev.axonivy.com/permalink/${{ inputs.ivyVersion }}/axonivy-engine.zip" "-Divy.engine.version=[14.0.0,]" ${{ inputs.mvnArgs }}'
       javaVersion: ${{ inputs.javaVersion }}
       mvnVersion: ${{ inputs.mvnVersion }}
       ivyVersion: ${{ inputs.ivyVersion }}
