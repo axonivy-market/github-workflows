@@ -8,7 +8,7 @@ on:
         default: 25
       mvnVersion:
         type: string
-        default: 3.9.8
+        default: 3.10.0
       mvnArgs:
         type: string
         required: false
