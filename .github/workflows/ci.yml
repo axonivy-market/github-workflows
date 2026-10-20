@@ -18,7 +18,7 @@ on:
         default: .github/cspell-extra-words.txt
       javaVersion:
         type: number
-        default: 21
+        default: 25
       mvnVersion:
         type: string
         default: 3.9.8
