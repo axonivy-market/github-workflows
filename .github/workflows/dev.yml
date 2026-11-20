@@ -8,7 +8,7 @@ on:
         required: false
       ivyVersion:
         type: string
-        default: dev
+        default: nightly-14
         description: the ivy version to use (e.g. dev/nightly/nightly-10/...)
       javaVersion:
         type: number
